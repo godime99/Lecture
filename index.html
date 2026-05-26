@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ko-KR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go_dime Lecture — 스케치업 플러그인 강의</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --green:#2E7D32;--green-light:#43A047;--green-bright:#66BB6A;
+  --green-pale:#E8F5E9;--green-dark:#1B5E20;
+  --dark:#0F1A0F;--dark2:#162316;
+  --text:#111827;--mid:#4B5563;--soft:#9CA3AF;
+  --border:#E5E7EB;--bg:#F9FAFB;
+  --max:1100px;--pad:clamp(24px,5vw,80px);
+}
+body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#fff;color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--pad);}
+nav{position:sticky;top:0;z-index:100;background:rgba(15,26,15,0.97);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.06);}
+.nav-inner{max-width:var(--max);margin:0 auto;padding:0 var(--pad);height:62px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.nav-logo{font-size:15px;font-weight:900;color:#fff;letter-spacing:0.03em;white-space:nowrap;}
+.nav-logo span{color:var(--green-bright);}
+.nav-links{display:flex;gap:8px;flex-wrap:wrap;}
+.nav-link{padding:8px 16px;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.65);transition:all 0.2s;white-space:nowrap;}
+.nav-link:hover{border-color:var(--green-bright);color:var(--green-bright);}
+.nav-link.primary{background:var(--green);color:#fff;border-color:var(--green);}
+.nav-link.primary:hover{background:var(--green-light);}
+.hero{padding:100px 0 88px;background:var(--dark);position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(46,125,50,0.18) 0%,transparent 70%);pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-150px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(102,187,106,0.08) 0%,transparent 70%);pointer-events:none;}
+.hero-tag{font-size:11px;letter-spacing:0.2em;font-weight:700;color:var(--green-bright);display:block;margin-bottom:24px;}
+.hero-title{font-size:clamp(32px,5vw,56px);font-weight:900;line-height:1.15;letter-spacing:-0.025em;color:#fff;}
+.hero-title .accent{color:var(--green-bright);}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;margin-top:22px;background:rgba(102,187,106,0.12);color:var(--green-bright);font-size:11px;font-weight:600;padding:7px 16px;border-radius:50px;border:1px solid rgba(102,187,106,0.25);}
+.hero-sub{font-size:13.5px;color:rgba(255,255,255,0.55);line-height:2;margin-top:14px;max-width:560px;}
+.hero-btns{display:flex;gap:10px;margin-top:36px;flex-wrap:wrap;}
+.btn-p{background:var(--green);color:#fff;border:none;padding:13px 28px;font-size:13px;font-weight:700;border-radius:8px;cursor:pointer;transition:all 0.2s;white-space:nowrap;box-shadow:0 4px 20px rgba(46,125,50,0.4);}
+.btn-p:hover{background:var(--green-light);transform:translateY(-1px);}
+.btn-s{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.15);padding:12px 22px;font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-s:hover{border-color:var(--green-bright);color:var(--green-bright);}
+.green-banner{background:var(--green);padding:40px 0;}
+.green-banner-inner{max-width:var(--max);margin:0 auto;padding:0 var(--pad);display:flex;justify-content:space-around;align-items:center;flex-wrap:wrap;gap:24px;}
+.banner-stat{text-align:center;}
+.banner-val{font-size:clamp(28px,4vw,44px);font-weight:900;color:#fff;letter-spacing:-0.03em;line-height:1;}
+.banner-lbl{font-size:12px;color:rgba(255,255,255,0.7);margin-top:6px;font-weight:600;}
+.section{padding:96px 0;border-bottom:1px solid var(--border);}
+.section-alt{background:var(--bg);}
+.sec-title{font-size:clamp(22px,3vw,30px);font-weight:900;line-height:1.25;letter-spacing:-0.02em;margin-bottom:48px;}
+.btn-p2{background:var(--green);color:#fff;border:none;padding:13px 28px;font-size:13px;font-weight:700;border-radius:8px;cursor:pointer;transition:background 0.2s;white-space:nowrap;}
+.btn-p2:hover{background:var(--green-light);}
+.btn-s2{background:#fff;color:var(--text);border:1.5px solid var(--border);padding:12px 22px;font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-s2:hover{border-color:var(--green);color:var(--green);}
+.pain-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.pain-card{padding:44px 36px;border-right:1px solid var(--border);transition:background 0.2s;}
+.pain-card:last-child{border-right:none;}
+.pain-card:hover{background:var(--bg);}
+.pain-num{font-size:60px;font-weight:900;color:#E5E7EB;line-height:1;margin-bottom:20px;letter-spacing:-0.03em;}
+.pain-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:14px;line-height:1.35;}
+.pain-desc{font-size:12.5px;color:var(--soft);line-height:1.9;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;}
+.left-title{font-size:clamp(20px,2.5vw,26px);font-weight:900;line-height:1.3;letter-spacing:-0.02em;}
+.left-title em{font-style:normal;color:var(--green);}
+.left-desc{font-size:13px;color:var(--mid);line-height:1.95;margin-top:18px;}
+.item-list{display:flex;flex-direction:column;gap:12px;}
+.list-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px 22px;display:grid;grid-template-columns:32px 1fr;gap:14px;align-items:start;transition:all 0.2s;}
+.list-item:hover{border-color:var(--green);box-shadow:0 4px 18px rgba(46,125,50,0.08);}
+.item-num{width:28px;height:28px;background:var(--green-pale);color:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.item-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.item-desc{font-size:12px;color:var(--soft);line-height:1.75;}
+.sol-layout{display:grid;grid-template-columns:220px 1fr;gap:60px;align-items:center;}
+.sol-circle{width:168px;height:168px;border-radius:50%;border:2px solid var(--green);background:var(--green-pale);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin:0 auto;}
+.sol-circle-txt{font-size:16px;font-weight:900;color:var(--green);}
+.sol-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px 22px;display:grid;grid-template-columns:32px 1fr;gap:14px;align-items:start;transition:all 0.2s;}
+.sol-item:hover{border-color:var(--green);box-shadow:0 4px 18px rgba(46,125,50,0.08);}
+.sol-num{width:28px;height:28px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.burden-layout{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;}
+.burden-cards{display:flex;flex-direction:column;gap:14px;}
+.burden-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:32px 32px;display:grid;grid-template-columns:auto 1fr;gap:0 28px;align-items:center;transition:all 0.2s;}
+.burden-card:hover{border-color:var(--green);box-shadow:0 6px 24px rgba(46,125,50,0.1);}
+.burden-value{font-size:40px;font-weight:900;color:var(--green);letter-spacing:-0.03em;white-space:nowrap;}
+.burden-label{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.burden-desc{font-size:11.5px;color:var(--soft);line-height:1.85;}
+.curr-rows{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:36px;}
+.curr-row{display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid var(--border);}
+.curr-row:last-child{border-bottom:none;}
+.curr-num-cell{background:var(--bg);border-right:1px solid var(--border);padding:24px;display:flex;align-items:center;justify-content:center;}
+.curr-badge{background:var(--green);color:#fff;font-size:11px;font-weight:700;padding:7px 16px;border-radius:7px;letter-spacing:0.04em;}
+.curr-content{padding:24px 32px;}
+.curr-item-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.curr-item-desc{font-size:12.5px;color:var(--soft);line-height:1.8;}
+.plugin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;}
+.plugin-card{border:1px solid var(--border);border-radius:10px;padding:25px 24px;background:#fff;position:relative;overflow:hidden;transition:all 0.2s;}
+.plugin-card::before{content:'';position:absolute;top:0;left:0;width:6px;height:100%;background:var(--green);}
+.plugin-card:hover{border-color:var(--green);box-shadow:0 6px 22px rgba(46,125,50,0.1);transform:translateY(-2px);}
+.plugin-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.plugin-name{font-size:20px;font-weight:800;color:var(--text);}
+.plugin-schedule{font-size:11px;color:var(--soft);text-align:right;line-height:1.75;}
+.plugin-desc{font-size:12px;color:var(--soft);line-height:1.85;margin-bottom:14px;}
+.plugin-info{font-size:11px;color:var(--soft);border-top:1px solid var(--border);padding-top:12px;display:flex;flex-direction:column;gap:3px;}
+.plugin-btn{display:inline-block;margin-top:12px;font-size:11px;font-weight:600;color:var(--green);border:1.5px solid var(--green);padding:6px 14px;border-radius:6px;cursor:pointer;transition:all 0.2s;}
+.plugin-btn:hover{background:var(--green);color:#fff;}
+.perks-row{display:flex;align-items:center;justify-content:center;margin-top:48px;}
+.perk-item{display:flex;flex-direction:column;align-items:center;gap:18px;flex:1;max-width:220px;}
+.perk-diamond-wrap{width:110px;height:110px;position:relative;margin:0 auto;}
+.perk-diamond{width:100%;height:100%;background:var(--green);transform:rotate(45deg);border-radius:12px;box-shadow:0 8px 28px rgba(46,125,50,0.22);transition:all 0.3s;}
+.perk-item:hover .perk-diamond{transform:rotate(45deg) scale(1.07);}
+.perk-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
+.perk-n{font-size:9px;font-weight:700;color:rgba(255,255,255,0.55);letter-spacing:0.12em;}
+.perk-emoji{font-size:26px;}
+.perk-label{font-size:14px;font-weight:700;color:var(--text);}
+.perk-desc{font-size:12px;color:var(--soft);text-align:center;line-height:1.8;max-width:160px;}
+.perk-plus{font-size:28px;color:var(--border);font-weight:200;padding:0 20px;margin-top:-52px;flex-shrink:0;}
+.instr-layout{display:grid;grid-template-columns:260px 1fr;gap:64px;align-items:start;}
+.instr-photo{width:220px;height:270px;background:var(--bg);border-radius:16px;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--soft);font-size:12px;}
+.instr-name{font-size:28px;font-weight:900;letter-spacing:-0.02em;margin-bottom:2px;}
+.instr-role{font-size:13px;font-weight:600;color:var(--green);margin-bottom:4px;}
+.instr-tags{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 24px;}
+.instr-tag{background:var(--green-pale);color:var(--green);font-size:11px;font-weight:600;padding:5px 14px;border-radius:6px;}
+.instr-desc{font-size:13px;color:var(--mid);line-height:1.95;margin-bottom:28px;}
+.instr-careers{display:flex;flex-direction:column;gap:10px;}
+.instr-career{display:flex;align-items:flex-start;gap:12px;padding:16px 20px;border:1px solid var(--border);border-radius:10px;background:#fff;transition:all 0.2s;}
+.instr-career:hover{border-color:var(--green);box-shadow:0 4px 16px rgba(46,125,50,0.07);}
+.instr-career-txt{font-size:12.5px;color:var(--mid);line-height:1.7;}
+.cta{background:var(--green);padding:96px 0;text-align:center;}
+.cta-title{font-size:clamp(22px,3vw,32px);font-weight:900;color:#fff;line-height:1.3;}
+.cta-sub{font-size:13px;color:rgba(255,255,255,0.6);margin:14px 0 32px;line-height:1.9;}
+.cta-btn{background:#fff;color:var(--green);border:none;padding:14px 44px;font-size:14px;font-weight:700;border-radius:8px;cursor:pointer;transition:all 0.2s;}
+.cta-btn:hover{background:#F0FDF4;}
+footer{border-top:1px solid var(--border);}
+.footer-inner{max-width:var(--max);margin:0 auto;padding:28px var(--pad);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.footer-logo{font-size:13px;font-weight:800;color:var(--text);}
+.footer-logo span{color:var(--green);}
+.footer-copy{font-size:11px;color:var(--soft);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;align-items:center;justify-content:center;padding:24px;}
+.modal-overlay.active{display:flex;}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:680px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.modal-header{padding:24px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-title{font-size:18px;font-weight:900;color:var(--text);}
+.modal-close{width:32px;height:32px;border:none;background:var(--bg);border-radius:8px;cursor:pointer;font-size:16px;color:var(--soft);display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.modal-close:hover{background:var(--border);}
+.modal-body{padding:28px;overflow-y:auto;flex:1;}
+.review-empty{text-align:center;padding:60px 20px;}
+.review-empty-icon{font-size:48px;margin-bottom:16px;}
+.review-empty-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.review-empty-desc{font-size:13px;color:var(--soft);line-height:1.8;}
+.review-list{display:flex;flex-direction:column;gap:16px;}
+.review-item{border:1px solid var(--border);border-radius:12px;padding:20px 22px;transition:all 0.2s;}
+.review-item:hover{border-color:var(--green-pale);box-shadow:0 4px 14px rgba(46,125,50,0.07);}
+.review-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.review-info{display:flex;align-items:center;gap:10px;}
+.review-avatar{width:36px;height:36px;border-radius:50%;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--green);flex-shrink:0;}
+.review-name{font-size:13px;font-weight:700;color:var(--text);}
+.review-course{font-size:11px;color:var(--soft);margin-top:1px;}
+.review-stars{font-size:14px;}
+.review-text{font-size:13px;color:var(--mid);line-height:1.85;}
+.review-date{font-size:11px;color:var(--soft);margin-top:10px;}
+.modal-footer{padding:16px 28px;border-top:1px solid var(--border);flex-shrink:0;}
+.admin-toggle{font-size:11px;color:var(--soft);cursor:pointer;background:none;border:none;padding:0;text-decoration:underline;}
+.admin-panel{display:none;margin-top:14px;}
+.admin-panel.active{display:block;}
+.admin-form{display:flex;flex-direction:column;gap:10px;}
+.admin-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.admin-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);outline:none;font-family:inherit;transition:border-color 0.2s;}
+.admin-input:focus{border-color:var(--green);}
+.admin-textarea{resize:vertical;min-height:80px;}
+.admin-select{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);outline:none;font-family:inherit;background:#fff;cursor:pointer;}
+.admin-submit{background:var(--green);color:#fff;border:none;padding:11px 20px;font-size:12px;font-weight:700;border-radius:8px;cursor:pointer;transition:background 0.2s;align-self:flex-start;}
+.admin-submit:hover{background:var(--green-light);}
+.admin-pw-wrap{display:flex;gap:8px;align-items:center;}
+.admin-pw-input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;font-family:inherit;}
+.admin-pw-btn{background:var(--green);color:#fff;border:none;padding:10px 16px;font-size:12px;font-weight:700;border-radius:8px;cursor:pointer;}
+.delete-btn{font-size:10px;color:var(--soft);background:none;border:1px solid var(--border);padding:3px 8px;border-radius:5px;cursor:pointer;margin-left:8px;transition:all 0.2s;}
+.delete-btn:hover{border-color:#ef4444;color:#ef4444;}
+.pmodal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:998;display:none;align-items:center;justify-content:center;padding:24px;}
+.pmodal-overlay.active{display:flex;}
+.pmodal{background:#fff;border-radius:16px;width:100%;max-width:720px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.25);}
+.pmodal-header{padding:22px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.pmodal-title{font-size:18px;font-weight:900;color:var(--text);}
+.pmodal-sub{font-size:11px;color:var(--soft);margin-top:3px;}
+.pmodal-close{width:32px;height:32px;border:none;background:var(--bg);border-radius:8px;cursor:pointer;font-size:16px;color:var(--soft);display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.pmodal-close:hover{background:var(--border);}
+.pmodal-body{padding:28px;overflow-y:auto;flex:1;}
+.pimg-empty{text-align:center;padding:52px 20px;}
+.pimg-empty-icon{font-size:44px;margin-bottom:14px;}
+.pimg-empty-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.pimg-empty-desc{font-size:12px;color:var(--soft);line-height:1.8;}
+.pimg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.pimg-item{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--bg);}
+.pimg-item img{width:100%;height:200px;object-fit:cover;display:block;}
+.pimg-caption{padding:10px 12px;font-size:12px;color:var(--mid);line-height:1.5;}
+.pimg-del{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;display:none;transition:background 0.2s;}
+.pimg-del:hover{background:rgba(239,68,68,0.85);}
+.admin-active .pimg-del{display:block;}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:1000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:20px;}
+.lightbox.active{display:flex;}
+.lightbox-img{max-width:90vw;max-height:82vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,0.5);}
+.lightbox-caption{font-size:13px;color:rgba(255,255,255,0.6);text-align:center;max-width:600px;}
+.lightbox-close{position:absolute;top:20px;right:24px;background:rgba(255,255,255,0.12);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;}
+.lightbox-close:hover{background:rgba(255,255,255,0.25);}
+.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);border:none;color:#fff;width:44px;height:44px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;}
+.lightbox-nav:hover{background:rgba(255,255,255,0.25);}
+.lightbox-prev{left:20px;}
+.lightbox-next{right:20px;}
+.lightbox-counter{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:0.1em;}
+.pimg-item img{cursor:zoom-in;}
+.pmodal-footer{padding:16px 28px;border-top:1px solid var(--border);flex-shrink:0;}
+.padmin-toggle{font-size:11px;color:var(--soft);cursor:pointer;background:none;border:none;padding:0;text-decoration:underline;}
+.padmin-panel{display:none;margin-top:14px;}
+.padmin-panel.active{display:block;}
+.padmin-form{display:flex;flex-direction:column;gap:10px;}
+.padmin-pw-wrap{display:flex;gap:8px;}
+.padmin-pw-input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;font-family:inherit;transition:border-color 0.2s;}
+.padmin-pw-input:focus{border-color:var(--green);}
+.padmin-pw-btn{background:var(--green);color:#fff;border:none;padding:10px 16px;font-size:12px;font-weight:700;border-radius:8px;cursor:pointer;}
+.padmin-upload-area{border:2px dashed var(--border);border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
+.padmin-upload-area:hover{border-color:var(--green);background:var(--green-pale);}
+.padmin-upload-icon{font-size:32px;margin-bottom:8px;}
+.padmin-upload-txt{font-size:13px;font-weight:600;color:var(--mid);}
+.padmin-upload-sub{font-size:11px;color:var(--soft);margin-top:4px;}
+.padmin-file-input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.padmin-caption-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;font-family:inherit;transition:border-color 0.2s;}
+.padmin-caption-input:focus{border-color:var(--green);}
+.padmin-preview{display:none;margin-top:10px;}
+.padmin-preview img{width:100%;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid var(--border);}
+.padmin-submit{background:var(--green);color:#fff;border:none;padding:11px 20px;font-size:12px;font-weight:700;border-radius:8px;cursor:pointer;transition:background 0.2s;align-self:flex-start;}
+.padmin-submit:hover{background:var(--green-light);}
+@media(max-width:900px){
+  .section{padding:72px 0;}.hero{padding:72px 0 60px;}.cta{padding:72px 0;}
+  .pain-grid{grid-template-columns:1fr;}.pain-card{border-right:none;border-bottom:1px solid var(--border);}.pain-card:last-child{border-bottom:none;}
+  .two-col{grid-template-columns:1fr;gap:40px;}.burden-layout{grid-template-columns:1fr;gap:40px;}.sol-layout{grid-template-columns:1fr;gap:36px;}
+  .plugin-grid{grid-template-columns:repeat(2,1fr);}.instr-layout{grid-template-columns:1fr;gap:36px;}.instr-photo{width:100%;height:180px;}.green-banner-inner{gap:32px;}
+}
+@media(max-width:600px){
+  .section{padding:56px 0;}.hero{padding:56px 0 48px;}.cta{padding:64px 0;}
+  .nav-links .nav-link:not(.primary){display:none;}.hero-btns{flex-direction:column;}.btn-p,.btn-s{width:100%;text-align:center;}
+  .plugin-grid{grid-template-columns:1fr;}.perks-row{flex-direction:column;gap:40px;}.perk-plus{margin-top:0;padding:0;}.perk-item{max-width:100%;}
+  .curr-row{grid-template-columns:1fr;}.curr-num-cell{border-right:none;border-bottom:1px solid var(--border);padding:14px;}.curr-content{padding:18px 20px;}
+  .footer-inner{flex-direction:column;align-items:flex-start;}.admin-row{grid-template-columns:1fr;}.green-banner-inner{flex-direction:column;gap:20px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">Go<span>_dime</span> Lecture</div>
+    <div class="nav-links">
+      <a href="#curriculum" class="nav-link">커리큘럼</a>
+      <a href="#perks" class="nav-link">혜택</a>
+      <a href="#instructor" class="nav-link">강사 소개</a>
+      <button class="nav-link" onclick="openReview()">후기 보기</button>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSddHJT1lLHFKQTCXXvZYMsLKabOnNwLAgkIHm_-j6uvoR-6sA/viewform?usp=header" target="_blank" class="nav-link primary">강의 신청 & 예제 보기</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-title">작업시간 부족,<br>낮은 퀄리티,<br>자유로운 루비 사용<br><span class="accent">모두 해결해 드리겠습니다.</span></div>
+    <div class="hero-badge">Not a Design Lecture, Focused only on Modeling Tech</div>
+    <div class="hero-sub">이제는 AI를 얼마나 잘 쓰느냐가 실력인 시대입니다. 단순히 명령어를 입력하는 단계를 넘어, AI에게 정확하고 디테일한 가이드를 주는 것이 중요해졌습니다. 고퀄리티의 결과물을 원한다면 AI에게 의존하기보다는 모델링의 수준부터 끌어올려야 합니다.</div>
+    <div class="hero-btns">
+      <button class="btn-p" onclick="document.getElementById('curriculum').scrollIntoView({behavior:'smooth'})">커리큘럼 보기</button>
+      <button class="btn-s" onclick="document.getElementById('perks').scrollIntoView({behavior:'smooth'})">혜택 보기</button>
+      <button class="btn-s" onclick="document.getElementById('instructor').scrollIntoView({behavior:'smooth'})">강사 소개</button>
+      <button class="btn-s" onclick="openReview()">후기 보기</button>
+    </div>
+  </div>
+</div>
+
+<div class="green-banner">
+  <div class="green-banner-inner">
+    <div class="banner-stat"><div class="banner-val">1Day</div><div class="banner-lbl">원데이 완성</div></div>
+    <div class="banner-stat"><div class="banner-val">2시간</div><div class="banner-lbl">집중 강의</div></div>
+    <div class="banner-stat"><div class="banner-val">3만원</div><div class="banner-lbl">부담 없는 수강료</div></div>
+    <div class="banner-stat"><div class="banner-val">6개</div><div class="banner-lbl">플러그인 강의</div></div>
+  </div>
+</div>
+
+<div class="section" id="pain">
+  <div class="wrap">
+    <div class="sec-title">혹시 이런 경험 있으신가요?</div>
+    <div class="pain-grid">
+      <div class="pain-card"><div class="pain-num">01</div><div class="pain-title">작업 시간이 오래 걸려요</div><div class="pain-desc">똑같은 작업을 반복해서 한다거나, 같은 기능을 써도 다른 사람들과는 다르게 시간이 오래 흘러있거나 하는 경험이 있으신가요?</div></div>
+      <div class="pain-card"><div class="pain-num">02</div><div class="pain-title">루비, 뭘 써야 할지 모르겠어요</div><div class="pain-desc">주변에서 루비를 사용하는 걸 보고 무작정 설치를 했는데 언제 어떤 루비를 어떻게 사용해야 할지 모르겠던 상황들이 있으신가요?</div></div>
+      <div class="pain-card"><div class="pain-num">03</div><div class="pain-title">열심히 해도 퀄리티가 별로예요</div><div class="pain-desc">분명 벽체, 창문, 문을 전부 모델링 했는데 아무리 뷰를 고쳐잡아도, 렌더링을 계속해도 기대만큼의 퀄리티가 나오지 않은 경험이 있으신가요?</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section section-alt" id="why">
+  <div class="wrap">
+    <div class="two-col">
+      <div>
+        <div class="left-title">아무리 열심히 해도,<br>실무 경력이 올라도<br>실력이 오르지 않는 <em>이유 ▶</em></div>
+        <div class="left-desc">플러그인을 메인으로 한 강의에 기본 툴에 대한 개념부터 작업 시 극한의 효율을 낼 수 있는 방법까지 다양한 예제를 통해 학습할 수 있도록 준비했습니다.<br><br>툴에 대한 이해가 부족하면 작업 효율이 떨어지고 피로도가 높아질 수밖에 없습니다. 이러한 부정적인 경험이 반복되면 새로운 시도에 대한 두려움이 생기고, 결국 창의적인 모델링이 불가능하게 됩니다.</div>
+      </div>
+      <div class="item-list">
+        <div class="list-item"><div class="item-num">01</div><div><div class="item-title">스케치업 각 툴의 개념 부족</div><div class="item-desc">개념을 잘 알고 이해를 하는 과정을 거쳐야 툴을 적재적소에 잘 사용할 수 있습니다.</div></div></div>
+        <div class="list-item"><div class="item-num">02</div><div><div class="item-title">다양한 모델링 경험 부족</div><div class="item-desc">반복되는 작업만 하는 실무와 학교에서 다양한 모델링 방법을 경험할 기회가 적다보니 고착된 방법과 사고로만 작업을 하게 됩니다.  </div></div></div>
+        <div class="list-item"><div class="item-num">03</div><div><div class="item-title">플러그인 학습 부족</div><div class="item-desc">플러그인이 작업을 편하게 해준다는 사실은 알지만, 바쁜 업무로 학습할 수 없는 상황이 많습니다. </div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="solution">
+  <div class="wrap">
+    <div class="sec-title">그래서 준비했습니다.</div>
+    <div class="sol-layout">
+      <div><div class="sol-circle"><div class="sol-circle-txt">플러그인 강의</div><div class="item-desc">(기본 스킬+루비)</div></div></div>
+      <div class="item-list">
+        <div class="sol-item"><div class="sol-num">01</div><div><div class="item-title">기본 툴에 대한 개념</div><div class="item-desc">플러그인 수업에서는 기본 툴에 대한 설명도 많이 다룹니다.<br>기본기를 탄탄하게 쌓아야 플러그인을 제대로 활용할 수 있습니다.</div></div></div>
+        <div class="sol-item"><div class="sol-num">02</div><div><div class="item-title">모델링 사고 확장</div><div class="item-desc">입체 형태를 분석하고 모델링을 보다 쉽게 할 수 있는 다양한 사고방식을 공유합니다.</div></div></div>
+        <div class="sol-item"><div class="sol-num">03</div><div><div class="item-title">최적의 작업 동선 찾기</div><div class="item-desc">모델링 시 작업시간을 늘리는 불필요한 동작들을 설명하고 효율적인 작업을 할 수 있는 방법을 학습할 수 있습니다.</div></div></div>
+        <div class="sol-item"><div class="sol-num">04</div><div><div class="item-title">플러그인에 대한 걱정 해소</div><div class="item-desc">"플러그인 = 어렵고 공부할 양이 많다" <br>다양한 예제를 통해 기존에 가지고 계셨던 플러그인에 대한 걱정을 해소해드립니다.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section section-alt" id="burden">
+  <div class="wrap">
+    <div class="burden-layout">
+      <div>
+        <div class="left-title">부담줄인 <em>1·2·3 </em>강의입니다.</div>
+        <div class="left-desc">한번 등록하면 긴 시간동안 수강해야 했던 부담, 한번 등록할 때 지불해야 하는 수강료의 부담, 원하지 않는 것도 들어야 한다는 시간에 대한 부담, 이 모든 것을 줄였습니다.<br><br>수강 초반에 가졌던 열정은 시간이 지남에 따라 점점 식기 마련입니다. 그래서 다회차가 아닌 원데이 클래스 형태로 준비했습니다.</div>
+      </div>
+      <div class="burden-cards">
+        <div class="burden-card"><div class="burden-value">1Day</div><div><div class="burden-label">원데이 클래스</div><div class="burden-desc">원하는 수업만 수강하실 수 있도록 요일마다 다른 <br>내용으로 강의를 진행합니다.</div></div></div>
+        <div class="burden-card"><div class="burden-value">2시간</div><div><div class="burden-label">집중 강의</div><div class="burden-desc">짧고 집중적으로. 핵심만 빠르게 학습할 수 있도록<br>강의를 구성했습니다.</div></div></div>
+        <div class="burden-card"><div class="burden-value">3만원</div><div><div class="burden-label">부담 없는 수강료</div><div class="burden-desc">타 강의보다 60% 저렴합니다. <br>Go dime : 15,000원/시간</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="curriculum">
+  <div class="wrap">
+    <div class="sec-title">쉽고 간단하게 배울 수 있는<br>강의로 준비했습니다.</div>
+    <div class="curr-rows">
+      <div class="curr-row"><div class="curr-num-cell"><span class="curr-badge">No. 01</span></div><div class="curr-content"><div class="curr-item-title">누구나 쉽게 시작할 수 있습니다.</div><div class="curr-item-desc">스케치업 기본 툴들을 사용하실 수만 있다면 누구나 쉽게 배울 수 있게 준비했습니다.</div></div></div>
+      <div class="curr-row"><div class="curr-num-cell"><span class="curr-badge">No. 02</span></div><div class="curr-content"><div class="curr-item-title">루비 설치 걱정은 하지 않으셔도 됩니다.</div><div class="curr-item-desc">강의에 사용되는 플러그인을 제공을 하며 설치하는 방법까지 알려드립니다.</div></div></div>
+      <div class="curr-row"><div class="curr-num-cell"><span class="curr-badge">No. 03</span></div><div class="curr-content"><div class="curr-item-title">강의는 칼같이 끝내지 않습니다!</div><div class="curr-item-desc">정규 강의시간 종료 이후에도 가능한 범위 안에서 개인 Q&A, 보충수업 진행합니다.<br>단, 긴 시간을 필요로하는 질문에 대해서는 제한이 있을 수 있습니다.</er></div></div></div>
+    </div>
+    <div class="plugin-grid">
+      <div class="plugin-card"><div class="plugin-top"><div class="plugin-name">JHS<br>Powerbar</div><div class="plugin-schedule">매주 월요일<br>1차) 18:00 – 20:00<br>2차) 20:10 – 22:10</div></div><div class="plugin-desc">스케치업 사용자가 가장 많이 사용하는 플러그인 중 하나. 배치와 생성에 특화된 플러그인을 쉽고 재밌게 배워보세요. 다양한 예제를 통해 단 하루 만에 자유자재로 사용할 수 있게 될 겁니다.</div><div class="plugin-info"><span>방식 : 온라인 강의</span><span>금액 : 3만원</span><br>(예제는 신청 페이지에서 확인)</div><span('JHS Powerbar','매주 월요일 18:00–20:00')"></span></div>
+      <div class="plugin-card"><div class="plugin-top"><div class="plugin-name">Cuviloft</div><div class="plugin-schedule">매주 화요일<br>1차) 18:00 – 20:00<br>2차) 20:10 – 22:10</div></div><div class="plugin-desc">선을 이용하여 면을 만드는 루비입니다. 특히 곡면 생성에 탁월한 성능을 보여주는 플러그인입니다. 선, 호, 원을 툴로 그릴 수만 있다면 어떤 곡면이든 만들게 될 겁니다.</div><div class="plugin-info"><span>방식 : 온라인 강의</span><span>금액 : 3만원</span><br>(예제는 신청 페이지에서 확인)</div><span('Cuviloft','매주 화요일 18:00–20:00')"></span></div>
+      <div class="plugin-card"><div class="plugin-top"><div class="plugin-name">Bending</div><div class="plugin-schedule">매주 수요일<br>1차) 18:00 – 20:00<br>2차) 20:10 – 22:10</div></div><div class="plugin-desc">직선과 곡선만 있다면 어떤 것이든 구부려주는 루비입니다. 비정형 모델링이 어려우시다면 위 루비부터 사용해 보는 것을 추천해 드립니다. 쉽지만 범용적으로 활용할 수 있는 루비를 경험해 보세요.</div><div class="plugin-info"><span>방식 : 온라인 강의</span><span>금액 : 3만원</span><br>(예제는 신청 페이지에서 확인)</div><span('Bending','매주 수요일 18:00–20:00')"></span></div>
+      <div class="plugin-card"><div class="plugin-top"><div class="plugin-name">Mapping</div><div class="plugin-schedule">매주 목요일<br>1차) 18:00 – 20:00<br>2차) 20:10 – 22:10</div></div><div class="plugin-desc">모델링을 잘 한다고 해도 맵핑을 원하는대로 할 수 없다면 공간이나 3D 객체를 완벽하게 표현할 수 없습니다. 단순한 면부터 곡면에 이르기까지 맵핑을 자유롭게 할 수 있고 세부적으로 수정하는 방법까지 배우게 됩니다.</div><div class="plugin-info"><span>방식 : 온라인 강의</span><span>금액 : 3만원</span><br>(예제는 신청 페이지에서 확인)</div><span('Mapping','매주 목요일 18:00–20:00')"></span></div>
+      <div class="plugin-card"><div class="plugin-top"><div class="plugin-name">Modify</div><div class="plugin-schedule">매주 금요일<br>1차) 18:00 – 20:00<br>2차) 20:10 – 22:10</div></div><div class="plugin-desc">모델링 시 원인을 알 수 없는 문제가 발생한다거나 문제를 직면했을 때 해결하지 못했던 경험이 있을 겁니다. 이 강의에서는 여러가지 상황에 대처할 수 있는 플러그인을 익히고 깔끔한 작업방식을 배우게 됩니다.</dr></div><div class="plugin-info"><span>방식 : 온라인 강의</span><span>금액 : 3만원</span><br>(예제는 신청 페이지에서 확인)</div><span('Modify / Inspector','매주 금요일 18:00–20:00')"></span></div>
+      <div class="plugin-card"><div class="plugin-top"><div class="plugin-name">Interior<br>Modeling</div><div class="plugin-schedule">매주 토요일 <br>1차) 10:00 – 12:00<br>2차) 13:00 – 15:00<br>3차) 18:00 – 20:00<br>4차) 20:10 – 22:10</div></div><div class="plugin-desc">50개가 넘는 하이엔드 주거공간을 모델링한 경험을 바탕으로 효율적으로 모델링하는 방법과 꼭 알아야 하는 디테일을 빠르게 챙겨가는 방법들에 대해서 배우게 됩니다.</span></div><div class="plugin-info"><span>방식 : 온라인 강의</span><span>금액 : 3만원</span><br>(예제는 신청 페이지에서 확인)</div><span('Interior Modeling','매주 토요일 18:00–20:00')"></span></div>
+       <div class="plugin-card"><div class="plugin-top"><div class="plugin-name">Tailored<br>Class</div><div class="plugin-schedule">매주 일요일<br>10:00 – 20:00 중 선택<br>(선착순)</div></div><div class="plugin-desc">완전히 1:1 방식으로 진행되는 개인 맞춤형 강의입니다. 졸업작품 모델링, 실무 모델링 등 작업하면서 힘들었던 부분, 도움이 필요한 부분 그 어떤 궁금증도 해결해주는 강의입니다. </span></div><div class="plugin-info"><span>방식 : 온라인 강의</span><span>금액 : 3만원</span></div><span('Interior Modeling','매주 토요일 18:00–20:00')"></span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section section-alt" id="perks">
+  <div class="wrap">
+    <div class="sec-title" style="margin-bottom:12px;">이런 혜택을 누릴 수 있습니다.</div>
+    <p style="font-size:13px;color:var(--soft);line-height:1.8;">그동안 드리지 못했던 혜택을 새로 오픈한 강의에서 드리려고 합니다.<br>여느 강의에서는 경험하지 못하는 혜택을 드리려고 합니다.</p>
+    <div class="perks-row">
+      <div class="perk-item"><div class="perk-diamond-wrap"><div class></div><div class="perk-inner"><div class="perk-n">01</div><div class="perk-emoji"><svg width="45" height="45" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#9B5CDB"/><stop offset="100%" style="stop-color:#6A1FD4"/></linearGradient></defs><rect x="1" y="1" width="24" height="22" rx="6" ry="6" fill="url(#bgGrad)"/><polygon points="10,7 10,17 19,12" fill="white" opacity="0.95"/><rect x="7" y="24" width="12" height="4" rx="2" ry="2" fill="url(#standGrad)"/></svg></div></div></div><div class="perk-label">녹화본 제공</div><div class="perk-desc">당일 진행한 영상을<br>소지 가능한 파일로 제공</div></div>
+      <div class="perk-plus">+</div>
+      <div class="perk-item"><div class="perk-diamond-wrap"><div class></div><div class="perk-inner"><div class="perk-n">02</div><div class="perk-emoji"><svg width="40" height="40" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.9934 2.343C20.9934 1.72159 20.7466 1.12564 20.3072 0.686238C19.8678 0.246838 19.2718 0 18.6504 0H2.343C1.72161 0 1.12564 0.246838 0.686238 0.686238C0.246838 1.12564 0 1.72159 0 2.343V18.6504C0 19.2718 0.246838 19.8678 0.686238 20.3072C1.12564 20.7466 1.72161 20.9934 2.343 20.9934H18.6504C19.2718 20.9934 19.8678 20.7466 20.3072 20.3072C20.7466 19.8678 20.9934 19.2718 20.9934 18.6504C20.9934 14.6111 20.9934 6.38229 20.9934 2.343Z" fill="#FAE100"/><path fill-rule="evenodd" clip-rule="evenodd" d="M6.00763 14.7087C3.79677 13.5675 2.3374 11.609 2.3374 9.38625C2.3374 5.86819 5.99337 3.01196 10.4965 3.01196C14.9996 3.01196 18.6556 5.86819 18.6556 9.38625C18.6556 12.9043 14.9996 15.7606 10.4965 15.7606C10.0304 15.7606 9.57344 15.73 9.12823 15.6711L5.72331 17.9565C5.62034 18.0256 5.48543 18.024 5.38408 17.9526C5.28272 17.8812 5.23591 17.7546 5.26637 17.6344L6.00763 14.7087ZM8.91338 7.44762C8.86572 7.4476 8.81731 7.45696 8.77073 7.47677C8.72646 7.49562 8.68787 7.52221 8.65579 7.55433L8.65536 7.55476C8.62264 7.58775 8.59657 7.62658 8.57824 7.66927L7.18329 10.9464C7.10454 11.1314 7.1908 11.3455 7.37576 11.4242C7.56074 11.503 7.77483 11.4167 7.85358 11.2317L8.17395 10.4791H9.65284L9.9732 11.2317C10.0519 11.4167 10.266 11.503 10.451 11.4242C10.636 11.3455 10.7222 11.1314 10.6435 10.9464L9.24853 7.66927C9.2297 7.625 9.20311 7.5864 9.17099 7.55433C9.13892 7.52221 9.10032 7.49562 9.05605 7.47677C9.00947 7.45696 8.96104 7.4476 8.91338 7.44762ZM11.4646 11.4534H12.9863C13.1873 11.4534 13.3505 11.2901 13.3505 11.0891C13.3505 10.8881 13.1873 10.7248 12.9863 10.7248H11.8289V7.81194C11.8289 7.6109 11.6657 7.44769 11.4646 7.44769C11.2636 7.44769 11.1004 7.6109 11.1004 7.81194V11.0891C11.1004 11.2901 11.2636 11.4534 11.4646 11.4534ZM5.77435 8.17617V11.0891C5.77435 11.2901 5.93756 11.4534 6.13858 11.4534C6.33962 11.4534 6.50283 11.2901 6.50283 11.0891V8.17617H7.44988C7.65089 8.17617 7.81413 8.01296 7.81413 7.81194C7.81413 7.6109 7.65089 7.44769 7.44988 7.44769H4.82731C4.62626 7.44769 4.46306 7.6109 4.46306 7.81194C4.46306 8.01296 4.62626 8.17617 4.82731 8.17617H5.77435ZM14.4027 10.0013L14.7221 9.68185L15.8686 11.2997C15.9848 11.4637 16.2123 11.5025 16.3763 11.3863C16.5404 11.2701 16.5792 11.0425 16.4629 10.8785L15.2447 9.15929L16.3345 8.06949C16.4766 7.92733 16.4766 7.69653 16.3345 7.55437C16.1923 7.41222 15.9615 7.41222 15.8194 7.55437L14.4027 8.97107V7.81194C14.4027 7.6109 14.2394 7.44769 14.0384 7.44769C13.8374 7.44769 13.6742 7.6109 13.6742 7.81194V11.0891C13.6742 11.2901 13.8374 11.4534 14.0384 11.4534C14.2394 11.4534 14.4027 11.2901 14.4027 11.0891V10.0013ZM8.91338 8.74193L8.48403 9.75061H9.34275L8.91338 8.74193Z" fill="#3C1E1E"/></svg></div></div></div><div class="perk-label">오픈채팅</div><div class="perk-desc">스케치업 고민을 <br>해결할 수 있는 오픈채팅방 입장</div></div>
+      <div class="perk-plus">+</div>
+      <div class="perk-item"><div class="perk-diamond-wrap"><div class></div><div class="perk-inner"><div class="perk-n">03</div><div class="perk-emoji"><svg width="45" height="45" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg"><rect x="28" y="0" width="14" height="35" rx="4" fill="#6B8BB5"/><rect x="58" y="0" width="14" height="35" rx="4" fill="#6B8BB5"/><rect x="12" y="33" width="76" height="20" rx="6" fill="#8AAED4"/><path d="M12,50 L12,90 Q12,118 50,118 Q88,118 88,90 L88,50 Z" fill="#8AAED4"/><path d="M22,58 L22,88 Q22,108 50,108 Q78,108 78,88 L78,58 Z" fill="#6B8BB5"/><rect x="43" y="116" width="14" height="14" rx="3" fill="#6B8BB5"/></svg></div></div></div><div class="perk-label">플러그인 제공</div><div class="perk-desc">직접 개발한 플러그인을 <br>무료로 제공</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="instructor">
+  <div class="wrap">
+    <div class="sec-title">강사 소개</div>
+      <div>
+        <div class="instr-name">Go_dime</div>
+        <div class="instr-role">강환국</div>
+        <div class="instr-role">스케치업 플러그인 강사 · 모델러</div>
+        <div class="instr-tags"><span class="instr-tag">Sketchup</span><span class="instr-tag">Modeling Workflow</span><span class="instr-tag">Basic Skill</span><span class="instr-tag">Efficient work</span></div>
+        <div class="instr-desc">스케치업 모델링과 플러그인 워크플로우를 전문으로 하는 강사입니다. 단순한 툴 사용법이 아닌, 실무에서 바로 적용 가능한 워크플로우와 사고방식을 함께 가르칩니다.<br>추가로 직접 개발한 플러그인을 수강생에게 무료로 제공하며, 강의 이후에도 오픈채팅을 통해 지속적인 모델링 피드백을 제공할 예정입니다.</div>
+        <div class="instr-careers">
+          <div class="instr-career-txt"><div class="instr-career">現) 스케치업 프리렌서 강사 겸 모델러</div></div>
+          <div class="instr-career"><div class="instr-career-txt">現) 스케치업 플러그인 컨텐츠 제작 (Go_dime)</div></div>
+          <div class="instr-career"><div class="instr-career-txt">前) Onblo CAD/Sketchup/Enscape 강사 겸 모델러</div></div>
+          <div class="instr-career"><div class="instr-career-txt">前) 인테리어티처 스케치업 모델러</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="section section-alt" id="perks">
+  <div class="wrap">
+    <div class="sec-title" style="margin-bottom:12px;">Contact</div>
+    <p style="font-size:13px;color:var(--soft);line-height:1.8;">E-mail : kanghg216@gmail.com <br>instagram : go_dime
+  </div>
+</div>
+
+<div class="cta" id="contact">
+  <div class="wrap">
+    <div class="cta-title">지금 바로 시작해보세요.</div>
+    <div class="cta-sub">작업시간 부족, 낮은 퀄리티, 자유로운 루비 사용<br>단 하루 만에 모두 해결해 드리겠습니다.</div>
+    <button class="cta-btn" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSddHJT1lLHFKQTCXXvZYMsLKabOnNwLAgkIHm_-j6uvoR-6sA/viewform?usp=header','_blank')">강의 신청 & 예제 보기</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Go<span>_dime</span> Lecture</div>
+    <div class="footer-copy">© 2025 Go_dime Lecture. All rights reserved.</div>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="reviewModal" onclick="closeReviewOnBg(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">수강생 후기</div>
+      <button class="modal-close" onclick="closeReview()">✕</button>
+    </div>
+    <div class="modal-body" id="reviewBody"></div>
+    <div class="modal-footer">
+      <button class="admin-toggle" onclick="toggleAdmin()">관리자</button>
+      <div class="admin-panel" id="adminPanel">
+        <div id="adminPwWrap">
+          <div class="admin-pw-wrap">
+            <input class="admin-pw-input" type="password" id="adminPw" placeholder="관리자 비밀번호" onkeydown="if(event.key==='Enter')checkPw()">
+            <button class="admin-pw-btn" onclick="checkPw()">확인</button>
+          </div>
+        </div>
+        <div id="adminFormWrap" style="display:none;">
+          <div class="admin-form">
+            <div class="admin-row">
+              <input class="admin-input" type="text" id="reviewName" placeholder="수강생 이름 (예: 김**)">
+              <input class="admin-input" type="text" id="reviewCourse" placeholder="수강 강의 (예: JHS Powerbar)">
+            </div>
+            <select class="admin-select" id="reviewStar">
+              <option value="5">5점 ⭐⭐⭐⭐⭐</option>
+              <option value="4">4점 ⭐⭐⭐⭐</option>
+              <option value="3">3점 ⭐⭐⭐</option>
+              <option value="2">2점 ⭐⭐</option>
+              <option value="1">1점 ⭐</option>
+              <option value="0">0점</option>
+            </select>
+            <textarea class="admin-input admin-textarea" id="reviewText" placeholder="후기 내용을 입력해주세요."></textarea>
+            <button class="admin-submit" onclick="addReview()">후기 등록</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightboxOnBg(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav lightbox-prev" onclick="lightboxNav(-1)">‹</button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+  <button class="lightbox-nav lightbox-next" onclick="lightboxNav(1)">›</button>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
+</div>
+
+<div class="pmodal-overlay" id="pluginModal" onclick="closePModalOnBg(event)">
+  <div class="pmodal">
+    <div class="pmodal-header">
+      <div>
+        <div class="pmodal-title" id="pmodalTitle"></div>
+        <div class="pmodal-sub" id="pmodalSub"></div>
+      </div>
+      <button class="pmodal-close" onclick="closePluginModal()">✕</button>
+    </div>
+    <div class="pmodal-body" id="pmodalBody"></div>
+    <div class="pmodal-footer">
+      <button class="padmin-toggle" onclick="togglePAdmin()">관리자</button>
+      <div class="padmin-panel" id="padminPanel">
+        <div id="padminPwWrap">
+          <div class="padmin-pw-wrap">
+            <input class="padmin-pw-input" type="password" id="padminPw" placeholder="관리자 비밀번호" onkeydown="if(event.key==='Enter')checkPAdminPw()">
+            <button class="padmin-pw-btn" onclick="checkPAdminPw()">확인</button>
+          </div>
+        </div>
+        <div id="padminFormWrap" style="display:none;">
+          <div class="padmin-form">
+            <div class="padmin-upload-area" id="padminUploadArea">
+              <div class="padmin-upload-icon"></div>
+              <div class="padmin-upload-txt">이미지를 클릭해서 업로드하세요</div>
+              <div class="padmin-upload-sub">JPG, PNG, GIF 지원 · 최대 5MB</div>
+              <input class="padmin-file-input" type="file" accept="image/*" id="padminFileInput" onchange="previewImage(event)">
+            </div>
+            <div class="padmin-preview" id="padminPreview">
+              <img id="padminPreviewImg" src="" alt="미리보기">
+            </div>
+            <input class="padmin-caption-input" type="text" id="padminCaption" placeholder="이미지 설명 (선택사항)">
+            <button class="padmin-submit" onclick="addPluginImage()">이미지 등록</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADMIN_PW='godime2025';
+function openReview(){document.getElementById('reviewModal').classList.add('active');document.body.style.overflow='hidden';renderReviews();}
+function closeReview(){document.getElementById('reviewModal').classList.remove('active');document.body.style.overflow='';}
+function closeReviewOnBg(e){if(e.target===document.getElementById('reviewModal'))closeReview();}
+function toggleAdmin(){document.getElementById('adminPanel').classList.toggle('active');}
+function checkPw(){
+  if(document.getElementById('adminPw').value===ADMIN_PW){
+    document.getElementById('adminPwWrap').style.display='none';
+    document.getElementById('adminFormWrap').style.display='block';
+  }else{alert('비밀번호가 틀렸습니다.');document.getElementById('adminPw').value='';}
+}
+function getReviews(){return JSON.parse(localStorage.getItem('godime_reviews')||'[]');}
+function saveReviews(r){localStorage.setItem('godime_reviews',JSON.stringify(r));}
+function addReview(){
+  const name=document.getElementById('reviewName').value.trim();
+  const course=document.getElementById('reviewCourse').value.trim();
+  const star=document.getElementById('reviewStar').value;
+  const text=document.getElementById('reviewText').value.trim();
+  if(!name||!text){alert('이름과 후기 내용을 입력해주세요.');return;}
+  const reviews=getReviews();
+  reviews.unshift({id:Date.now(),name,course,star:parseInt(star),text,date:new Date().toLocaleDateString('ko-KR')});
+  saveReviews(reviews);
+  document.getElementById('reviewName').value='';
+  document.getElementById('reviewCourse').value='';
+  document.getElementById('reviewText').value='';
+  document.getElementById('reviewStar').value='5';
+  renderReviews();
+}
+function deleteReview(id){
+  if(!confirm('후기를 삭제할까요?'))return;
+  saveReviews(getReviews().filter(r=>r.id!==id));
+  renderReviews();
+}
+function renderReviews(){
+  const reviews=getReviews();
+  const body=document.getElementById('reviewBody');
+  const isAdmin=document.getElementById('adminFormWrap').style.display==='block';
+  if(reviews.length===0){
+    body.innerHTML=`<div class="review-empty"><div class="review-empty-icon"></div><div class="review-empty-title">아직 등록된 후기가 없습니다.</div><div class="review-empty-desc">강의를 수강하신 분들의 후기가 곧 등록될 예정입니다.</div></div>`;
+    return;
+  }
+  body.innerHTML=`<div class="review-list">${reviews.map(r=>`<div class="review-item"><div class="review-top"><div class="review-info"><div class="review-avatar">${r.name[0]}</div><div><div class="review-name">${r.name}${isAdmin?`<button class="delete-btn" onclick="deleteReview(${r.id})">삭제</button>`:''}</div><div class="review-course">${r.course||'Go_dime Lecture'}</div></div></div><div class="review-stars">${'⭐'.repeat(r.star)}</div></div><div class="review-text">${r.text}</div><div class="review-date">${r.date}</div></div>`).join('')}</div>`;
+}
+let currentPlugin='';
+let pAdminUnlocked=false;
+function openPluginModal(name,schedule){
+  currentPlugin=name;
+  document.getElementById('pmodalTitle').textContent=name;
+  document.getElementById('pmodalSub').textContent=schedule;
+  document.getElementById('pluginModal').classList.add('active');
+  document.body.style.overflow='hidden';
+  pAdminUnlocked=false;
+  document.getElementById('padminPanel').classList.remove('active');
+  document.getElementById('padminPwWrap').style.display='block';
+  document.getElementById('padminFormWrap').style.display='none';
+  document.getElementById('padminPw').value='';
+  document.getElementById('padminPreview').style.display='none';
+  document.getElementById('padminCaption').value='';
+  document.getElementById('padminFileInput').value='';
+  renderPluginImages();
+}
+function closePluginModal(){document.getElementById('pluginModal').classList.remove('active');document.body.style.overflow='';}
+function closePModalOnBg(e){if(e.target===document.getElementById('pluginModal'))closePluginModal();}
+function togglePAdmin(){document.getElementById('padminPanel').classList.toggle('active');}
+function checkPAdminPw(){
+  if(document.getElementById('padminPw').value===ADMIN_PW){
+    pAdminUnlocked=true;
+    document.getElementById('padminPwWrap').style.display='none';
+    document.getElementById('padminFormWrap').style.display='block';
+    renderPluginImages();
+  }else{alert('비밀번호가 틀렸습니다.');document.getElementById('padminPw').value='';}
+}
+function getPluginImages(name){const key='godime_plugin_'+name.replace(/\s+/g,'_');return JSON.parse(localStorage.getItem(key)||'[]');}
+function savePluginImages(name,imgs){const key='godime_plugin_'+name.replace(/\s+/g,'_');localStorage.setItem(key,JSON.stringify(imgs));}
+function previewImage(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  if(file.size>5*1024*1024){alert('5MB 이하 이미지만 업로드 가능합니다.');return;}
+  const reader=new FileReader();
+  reader.onload=function(ev){document.getElementById('padminPreviewImg').src=ev.target.result;document.getElementById('padminPreview').style.display='block';};
+  reader.readAsDataURL(file);
+}
+function addPluginImage(){
+  const fileInput=document.getElementById('padminFileInput');
+  const caption=document.getElementById('padminCaption').value.trim();
+  const previewSrc=document.getElementById('padminPreviewImg').src;
+  if(!fileInput.files[0]||!previewSrc.startsWith('data:')){alert('이미지를 선택해주세요.');return;}
+  const imgs=getPluginImages(currentPlugin);
+  imgs.push({id:Date.now(),src:previewSrc,caption});
+  savePluginImages(currentPlugin,imgs);
+  fileInput.value='';
+  document.getElementById('padminCaption').value='';
+  document.getElementById('padminPreview').style.display='none';
+  document.getElementById('padminPreviewImg').src='';
+  renderPluginImages();
+}
+function deletePluginImage(id){
+  if(!confirm('이미지를 삭제할까요?'))return;
+  savePluginImages(currentPlugin,getPluginImages(currentPlugin).filter(i=>i.id!==id));
+  renderPluginImages();
+}
+function renderPluginImages(){
+  const imgs=getPluginImages(currentPlugin);
+  const body=document.getElementById('pmodalBody');
+  if(imgs.length===0){body.innerHTML=`<div class="pimg-empty"><div class="pimg-empty-icon"></div><div class="pimg-empty-title">등록된 이미지가 없습니다.</div><div class="pimg-empty-desc">강의 관련 이미지가 곧 업로드될 예정입니다.</div></div>`;return;}
+  const adminClass=pAdminUnlocked?'admin-active':'';
+  body.innerHTML=`<div class="pimg-grid ${adminClass}">${imgs.map((i,idx)=>`<div class="pimg-item"><img src="${i.src}" alt="${i.caption||'강의 이미지'}" onclick="openLightbox(${idx})">${i.caption?`<div class="pimg-caption">${i.caption}</div>`:''}<button class="pimg-del" onclick="deletePluginImage(${i.id})">삭제</button></div>`).join('')}</div>`;
+}
+let lbImages=[],lbIndex=0;
+function openLightbox(idx){lbImages=getPluginImages(currentPlugin);lbIndex=idx;showLightboxImage();document.getElementById('lightbox').classList.add('active');}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('active');}
+function closeLightboxOnBg(e){if(e.target===document.getElementById('lightbox'))closeLightbox();}
+function showLightboxImage(){
+  const img=lbImages[lbIndex];
+  document.getElementById('lightboxImg').src=img.src;
+  document.getElementById('lightboxCaption').textContent=img.caption||'';
+  document.getElementById('lightboxCounter').textContent=`${lbIndex+1} / ${lbImages.length}`;
+}
+function lightboxNav(dir){lbIndex=(lbIndex+dir+lbImages.length)%lbImages.length;showLightboxImage();}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeReview();closePluginModal();closeLightbox();}
+  if(document.getElementById('lightbox').classList.contains('active')){
+    if(e.key==='ArrowLeft')lightboxNav(-1);
+    if(e.key==='ArrowRight')lightboxNav(1);
+  }
+});
+</script>
+</body>
+</html>
